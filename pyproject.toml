@@ -1,0 +1,25 @@
+[project]
+name = "retention-container"
+version = "0.1.0"
+description = "Add your description here"
+authors = [{ name = "ivan", email = "carney520@hotmail.com" }]
+dependencies = ["pygithub>=2.4.0"]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = [
+    "ipykernel>=6.29.5",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/retention_container"]
