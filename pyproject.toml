@@ -14,9 +14,7 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 virtual = true
-dev-dependencies = [
-    "ipykernel>=6.29.5",
-]
+dev-dependencies = ["ipykernel>=6.29.5", "python-dotenv>=1.0.1"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

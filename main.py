@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timezone, timedelta
+import re
 from typing import TypedDict, List
 from github import Auth, Github
 
@@ -14,6 +15,9 @@ class Package(TypedDict):
     id: int
     name: str
     version_count: int
+
+
+TAMP_TAG = re.compile(r"^(temp|poc|feat|dev|debug)-.*$")
 
 
 class GithubPackageCleaner:
@@ -55,14 +59,25 @@ class GithubPackageCleaner:
 
             tags = version["metadata"]["container"]["tags"]
 
-            if created_at < one_month_ago and not tags:
+            if created_at < one_month_ago and self.is_tags_safe_to_delete(tags):
                 outdated.append(version)
 
         return outdated
 
+    def is_tags_safe_to_delete(self, tags: list[str] | None) -> bool:
+        if not tags:
+            return True
+
+        if len(tags) == 1:
+            tag = tags[0]
+            return TAMP_TAG.match(tag) is not None
+
+        return False
+
     def delete_package_version(self, pkg_name: str, version_id: int) -> None:
         """删除指定的包版本"""
         print(f"正在删除 {pkg_name} 版本 {version_id}")
+
         self.github._Github__requester.requestJsonAndCheck(
             "DELETE",
             f"/orgs/{self.org_name}/packages/container/{pkg_name}/versions/{version_id}",
@@ -102,4 +117,9 @@ def main():
 
 
 if __name__ == "__main__":
+    if os.getenv("DEBUG"):
+        from dotenv import load_dotenv
+
+        load_dotenv(".env.local")
+
     main()
